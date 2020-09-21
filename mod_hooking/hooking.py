@@ -1,6 +1,6 @@
 import inspect
 import sys
-from functools import update_wrapper
+from functools import update_wrapper, wraps
 
 
 class Hook(object):
@@ -12,6 +12,13 @@ class Hook(object):
 
     def __call__(self, *args, **kwargs):
         return self.strategy(self.orig_func, self.func, *args, **kwargs)
+
+    def __get__(self, instance, cls):
+        @wraps(self.orig_func)
+        def bound(*args, **kwargs):
+            return self(instance, *args, **kwargs)
+
+        return bound
 
 
 def hook(strategy, module, func_name, func):
