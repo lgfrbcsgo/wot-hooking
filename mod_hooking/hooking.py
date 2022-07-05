@@ -47,10 +47,14 @@ def unhook(module, func_name, strategy=None, func=None):
 
 
 def monkey_patch(module, func_name, func):
-    if inspect.ismodule(module):
-        setattr(sys.modules[module.__name__], func_name, func)
-    elif inspect.isclass(module):
-        setattr(module, func_name, func)
+    target = sys.modules[module.__name__] if inspect.ismodule(module) else module
+
+    if not hasattr(target, func_name):
+        raise AssertionError(
+            "%s does not exist on %s.".format(func_name, module.__name__)
+        )
+
+    setattr(target, func_name, func)
 
 
 def hooking_strategy(strategy_func):
