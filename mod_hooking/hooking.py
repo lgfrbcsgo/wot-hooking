@@ -14,6 +14,9 @@ class Hook(object):
         return self.strategy(self.orig_func, self.func, *args, **kwargs)
 
     def __get__(self, instance, cls):
+        if instance is None:
+            return self
+
         @wraps(self.orig_func)
         def bound(*args, **kwargs):
             return self(instance, *args, **kwargs)
