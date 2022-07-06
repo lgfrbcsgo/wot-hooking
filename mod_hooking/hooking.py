@@ -52,10 +52,8 @@ def unhook(module, func_name, strategy=None, func=None):
 def monkey_patch(module, func_name, func):
     target = sys.modules[module.__name__] if inspect.ismodule(module) else module
 
-    if not hasattr(target, func_name):
-        raise AssertionError(
-            "%s does not exist on %s.".format(func_name, module.__name__)
-        )
+    # raises an error if the target attribute does not exist
+    getattr(target, func_name, func)
 
     setattr(target, func_name, func)
 
