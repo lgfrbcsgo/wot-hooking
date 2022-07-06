@@ -1,5 +1,5 @@
 from mod_hooking.hooking import hooking_strategy
-from debug_utils import LOG_CURRENT_EXCEPTION
+from mod_hooking.logging import LOG_CURRENT_EXCEPTION
 
 
 @hooking_strategy
