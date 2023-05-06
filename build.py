@@ -94,15 +94,15 @@ def release():
 
 @task(release)
 def github_actions_release():
-    print("::set-output name=version::{}".format(get_version()))
+    set_github_actions_output("version", get_version())
 
     wotmod_path = path.join("dist/wotmod", get_wotmod_name())
-    print("::set-output name=wotmod_path::{}".format(wotmod_path))
-    print("::set-output name=wotmod_name::{}".format(get_wotmod_name()))
+    set_github_actions_output("wotmod_path", wotmod_path)
+    set_github_actions_output("wotmod_name", get_wotmod_name())
 
     release_path = path.join("dist/release", get_release_name())
-    print("::set-output name=release_path::{}".format(release_path))
-    print("::set-output name=release_name::{}".format(get_release_name()))
+    set_github_actions_output("release_path", release_path)
+    set_github_actions_output("release_name", get_release_name())
 
 
 @task(wotmod)
@@ -116,8 +116,11 @@ def get_id():
 
 
 def get_version():
-    tag = subprocess.check_output(["git", "describe", "--tags"]).strip()
-    return tag.lstrip("v")
+    try:
+        tag = subprocess.check_output(["git", "describe", "--tags"]).strip()
+        return tag.lstrip("v")
+    except subprocess.CalledProcessError:
+        return "unknown"
 
 
 def get_wotmod_name():
@@ -134,6 +137,11 @@ def get_files(directory):
     for root, _, files in os.walk(directory):
         for file_name in files:
             yield path.join(root, file_name)
+
+
+def set_github_actions_output(name, value):
+    with open(os.environ['GITHUB_OUTPUT'], 'a') as f:
+        f.write("{}={}\n".format(name, value))
 
 
 if __name__ == "__main__":
